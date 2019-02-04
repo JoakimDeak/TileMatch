@@ -4,35 +4,60 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerHeight - 10;
 canvas.height = canvas.width;
 
-window.gridSize = 5;
+window.gridSize = 6;
 window.squareSize = Math.floor(canvas.width / gridSize);
+window.score = 0;
 
 canvas.addEventListener("mousedown", mouseDown);
 canvas.addEventListener("mouseup", mouseUp);
 canvas.addEventListener("mousemove", mouseMove);
+window.mouseIsDown = false;
 
 setup();
 
 function setup() {
     window.grid = createGrid(gridSize);
     draw();
+    update();
 }
 
 function update() {
-
-    requestAnimationFrame(update);
+    console.log(score);
+    let prevGrid = copyGrid(grid);
+    floodFillAll();
+    fall();
+    fillEmpty();
+    draw();
+    if(!gridIsSame(grid, prevGrid)){
+        requestAnimationFrame(update);
+    }
 }
 
 function mouseDown() {
-
+    mouseIsDown = true;
+    window.prevXPos = Math.floor(event.clientX / squareSize);
+    window.prevYPos = Math.floor(event.clientY / squareSize);
 }
 
 function mouseUp() {
-
+    mouseIsDown = false;
 }
 
 function mouseMove() {
+    if(mouseIsDown){
+        let xPos = Math.floor(event.clientX / squareSize);
+        let yPos = Math.floor(event.clientY / squareSize);
 
+        if(xPos !== prevXPos || yPos !== prevYPos){
+            let temp = grid[prevYPos][prevXPos];
+            grid[prevYPos][prevXPos] = grid[yPos][xPos];
+            grid[yPos][xPos] = temp;
+            window.prevXPos = xPos;
+            window.prevYPos = yPos;
+            window.mouseIsDown = false;
+            update();
+        }
+    }
 }
 
 function createGrid(size) {
@@ -44,6 +69,27 @@ function createGrid(size) {
         }
     }
     return grid;
+}
+
+function gridIsSame(grid1, grid2){ // grid1 and grid2 are assumed to be of same size
+    for(let i = 0; i < gridSize; i++){
+        for(let j = 0; j < gridSize; j++){
+            if(grid1[j][i] !== grid2[j][i]){
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+function copyGrid(grid1){
+    let copy = createGrid(gridSize);
+    for(let i = 0; i < gridSize; i++){
+        for(let j = 0; j < gridSize; j++){
+            copy[j][i] = grid1[j][i];
+        }
+    }
+    return copy;
 }
 
 function fall() {
@@ -59,7 +105,6 @@ function fall() {
             }
         }
     }
-    fillEmpty();
 }
 
 function fillEmpty() {
@@ -77,6 +122,7 @@ function floodFill(x, y, target) {
         return;
     }
     grid[y][x] = 0;
+    score++;
     if (x > 0) {
         floodFill(x - 1, y, target, 0);
     }

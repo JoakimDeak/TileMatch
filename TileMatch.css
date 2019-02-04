@@ -1,0 +1,11 @@
+*{
+    margin: 0;
+    overflow: hidden;
+    user-select: none;
+}
+h1{
+    float: right;
+    margin-right: 20vw;
+    margin-top: 10vh;
+    font-size: 50px;
+}

@@ -76,43 +76,40 @@ function floodFill(x, y, target) {
     if (target === 0 || grid[y][x] !== target) {
         return;
     }
-    let matchingNeighbours = 0;
-    if (x > 0 && grid[y][x - 1]) {
-        matchingNeighbours++;
+    grid[y][x] = 0;
+    if (x > 0) {
+        floodFill(x - 1, y, target, 0);
     }
-    if (y > 0 && grid[y - 1][x]) {
-        matchingNeighbours++;
+    if (y > 0) {
+        floodFill(x, y - 1, target, 0);
     }
-    if (x < gridSize - 1 && grid[y][x + 1]) {
-        matchingNeighbours++;
+    if (x < gridSize - 1) {
+        floodFill(x + 1, y, target, 0);
     }
-    if (y < gridSize - 1 && grid[y + 1][x]) {
-        matchingNeighbours++;
+    if (y < gridSize - 1) {
+        floodFill(x, y + 1, target, 0);
     }
-    if (matchingNeighbours > 1) {
-        grid[y][x] = 0;
-    }
-    if (matchingNeighbours > 0) {
-        if (x > 0) {
-            floodFill(x - 1, y, target, 0);
-        }
-        if (y > 0) {
-            floodFill(x, y - 1, target, 0);
-        }
-        if (x < gridSize - 1) {
-            floodFill(x + 1, y, target, 0);
-        }
-        if (y < gridSize - 1) {
-            floodFill(x, y + 1, target, 0);
-        }
-    }
-
 }
 
 function floodFillAll() {
     for (let i = 0; i < gridSize; i++) {
         for (let j = 0; j < gridSize; j++) {
-            floodFill(i, j, grid[j][i]);
+            let neighbours = 0; // a tile is a neighbour if it is an adjacent tile of the same color
+            if(i > 0 && grid[j][i] === grid[j][i - 1]){
+                neighbours++;
+            }
+            if(j > 0 && grid[j][i] === grid[j - 1][i]){
+                neighbours++;
+            }
+            if(i < gridSize - 1 && grid[j][i] === grid[j][i + 1]){
+                neighbours++;
+            }
+            if(j < gridSize - 1 && grid[j][i] === grid[j + 1][i]){
+                neighbours++;
+            }
+            if(neighbours > 1){
+                floodFill(i, j, grid[j][i]);
+            }
         }
     }
 }
